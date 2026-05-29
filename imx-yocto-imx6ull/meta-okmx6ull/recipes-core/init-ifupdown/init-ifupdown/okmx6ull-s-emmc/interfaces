@@ -1,0 +1,29 @@
+# /etc/network/interfaces -- configuration file for ifup(8), ifdown(8)
+
+auto lo
+iface lo inet loopback
+
+iface wlan0 inet dhcp
+	wireless_mode managed
+	wireless_essid any
+	wpa-driver wext
+	wpa-conf /etc/wpa_supplicant.conf
+
+iface atml0 inet dhcp
+
+auto eth0
+iface eth0 inet static
+	address 192.168.1.50
+	netmask 255.255.255.0
+	gateway 192.168.1.1
+	dns-nameservers 192.168.1.1 8.8.8.8
+
+iface eth1 inet dhcp
+
+iface usb0 inet static
+	address 192.168.7.2
+	netmask 255.255.255.0
+	network 192.168.7.0
+	gateway 192.168.7.1
+
+iface bnep0 inet dhcp
