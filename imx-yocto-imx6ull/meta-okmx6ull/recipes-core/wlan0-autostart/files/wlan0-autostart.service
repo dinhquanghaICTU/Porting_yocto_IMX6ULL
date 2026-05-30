@@ -1,0 +1,12 @@
+[Unit]
+Description=Bring up wlan0
+After=systemd-modules-load.service
+
+[Service]
+Type=oneshot
+ExecStartPre=/bin/sh -c 'for i in $(seq 1 20); do [ -e /sys/class/net/wlan0 ] && exit 0; sleep 1; done; exit 1'
+ExecStart=/sbin/ifup wlan0
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

@@ -24,6 +24,7 @@ imx-yocto-imx6ull/meta-okmx6ull/*
 !imx-yocto-imx6ull/meta-okmx6ull/recipes-core/**
 !imx-yocto-imx6ull/meta-okmx6ull/recipes-support/
 !imx-yocto-imx6ull/meta-okmx6ull/recipes-support/**
+!imx-yocto-imx6ull/meta-okmx6ull/recipes-apps/
 
 imx-yocto-imx6ull/.repo/
 **/.repo/

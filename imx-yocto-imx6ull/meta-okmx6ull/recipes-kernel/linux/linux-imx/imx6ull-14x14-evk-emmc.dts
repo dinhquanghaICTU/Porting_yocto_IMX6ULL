@@ -3,49 +3,55 @@
  */
 #include "imx6ull-14x14-evk.dts"
 
-/*
-* - cu phap co the  xem tren trang http://www.devicetree.org/Device_Tree_Usage
-* hoac /home/quanghaictu/learn_yocto/imx-yocto-imx6ull/build-fb/tmp/work-shared/okmx6ull-s-emmc/kernel-source/Documentation/devicetree
-*
-*/
-
 / {
+	leds {
+		compatible = "gpio-leds";
+		pinctrl-names = "default";
+		status = "okay";
 
-	/* -tao ra mot node co nhan la: reg_wifi_en
-	* -ten node la:regulator-wifi-en 
-	* -compatible: khai bao de node thuoc loai thiet bi. chi dinh cho HDH biet
-	* driver nao xu ly cai nay <phu luu an>
-	* -regulator-min-microvolt: dien ap thap nhat co the chiu
-	* -regulator-max-michiucrovolt: dien ap cao nhat co the chiu
-	* -gpios dung gpio nao va duoc active nhu nao (&gpio_spi tham chieu toi dia chi node khac 
-	* de xu ly duoc include imx6ull-14x14-evk.dts )
-	* -regulator-boot-on : khi khoi dong bat cai nay len 
-	* -regulator-always-on luon duoc bat kernel khong duoc tat no
-	* -*** con hai chan d+ voi d- tren schematic khong can khai bao vi no duoc gan cung 
-	* tren board khi phat hien ra no se biet dung chan nao
-	*/
-
+		led2 {
+			label = "led2";
+			gpios = <&gpio5 9 GPIO_ACTIVE_LOW>;
+			default-state = "off";
+			
+		};
+		led1 {
+			label = "led1";
+			gpios = <&gpio1 9 GPIO_ACTIVE_LOW>;
+			default-state = "off";
+		};
+	};
 
 	reg_wifi_en: regulator-wifi-en {
 		compatible = "regulator-fixed";
 		regulator-name = "wifi-en";
 		regulator-min-microvolt = <3300000>;
-		regulator-max-michiucrovolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
 		gpios = <&gpio_spi 4 GPIO_ACTIVE_LOW>;
 		regulator-boot-on;
 		regulator-always-on;
 	};
 };
 
-/*
-* tham chieu toi node cha &usbotg2 chinh la bus usb duoc include imx6ull-14x14-evk.dts 
-* dr_mode = "host"; cau hinh cho usbotg controler biet nó là usb host no 
-* co the chua 4 usb con trong schematic co noi  
-* disable-over-current; tat chuc nang qua dong khi xuat 5v ra chap hay gi thi nó khong checkcheck
-* status = "okay"; override lai include của hang no tat 
-*/
+&reg_sd1_vmmc {
+	/delete-property/ gpio;
+	/delete-property/ enable-active-high;
+	/delete-property/ off-on-delay-us;
+};
+
+&pinctrl_usdhc1 {
+	fsl,pins = <
+		MX6UL_PAD_SD1_CMD__USDHC1_CMD		0x17059
+		MX6UL_PAD_SD1_CLK__USDHC1_CLK		0x10071
+		MX6UL_PAD_SD1_DATA0__USDHC1_DATA0	0x17059
+		MX6UL_PAD_SD1_DATA1__USDHC1_DATA1	0x17059
+		MX6UL_PAD_SD1_DATA2__USDHC1_DATA2	0x17059
+		MX6UL_PAD_SD1_DATA3__USDHC1_DATA3	0x17059
+	>;
+};
+
 &usbotg2 {
-    dr_mode = "host";
-    disable-over-current;
-    status = "okay";
+	dr_mode = "host";
+	disable-over-current;
+	status = "okay";
 };
