@@ -1,0 +1,14 @@
+[Unit]
+Description=HNN OKM6ULL OTA Application
+After=wlan0-autostart.service mosquitto.service
+Wants=wlan0-autostart.service
+
+[Service]
+Type=simple
+ExecStartPre=/bin/sh -c 'for i in $(seq 1 30); do ip route | grep -q default && exit 0; sleep 1; done; exit 1'
+ExecStart=/usr/bin/mqtt_led_app
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
