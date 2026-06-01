@@ -1,4 +1,15 @@
+# Ghi file U-Boot raw image vào đầu disk.
+# Đây không phải partition bình thường nên dùng --no-table.
 part u-boot --source rawcopy --sourceparams="file=u-boot.imx" --ondisk mmcblk --no-table --align 1
+
+# Tạo boot partition dạng FAT.
+# Các file trong IMAGE_BOOT_FILES sẽ được copy vào partition này:
+# zImage, zImage_A, zImage_B, DTB, boot.scr...
 part /boot --source bootimg-partition --ondisk mmcblk --fstype=vfat --label BOOT --active --align 8192 --size 120
+
+# Tạo rootfs partition chính.
+# Nội dung lấy từ rootfs do Yocto build ra.
 part / --source rootfs --ondisk mmcblk --fstype=ext4 --label rootfs --align 8192 --fixed-size 1900M
+
+# Dùng partition table kiểu MBR/msdos.
 bootloader --ptable msdos
