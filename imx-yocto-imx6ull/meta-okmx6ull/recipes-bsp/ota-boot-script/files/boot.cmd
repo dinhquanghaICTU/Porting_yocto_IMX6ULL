@@ -9,6 +9,14 @@ if test "${boot_slot}" = ""; then
     setenv boot_slot A
 fi
 
+if test "${kernel_slot}" = ""; then
+    setenv kernel_slot ${boot_slot}
+fi
+
+if test "${rootfs_slot}" = ""; then
+    setenv rootfs_slot ${boot_slot}
+fi
+
 #tạo thêm biến upgrade_available để làm cờ Đang có bản OTA mới vừa ghi xong
 #và chưa được xác nhận boot OK. U-Boot bắt đầu quan tâm bootcount.
 if test "${upgrade_available}" = ""; then
@@ -28,9 +36,9 @@ fi
 #lưu env xuống eMMC
 #reset board
 
-if test "${ota_env_ready}" != "1"; then
-    setenv altbootcmd 'echo "OTA rollback"; if test "${boot_slot}" = "B"; then setenv boot_slot A; else setenv boot_slot B; fi; setenv upgrade_available 0; setenv bootcount 0; saveenv; reset'
-    setenv ota_env_ready 1
+if test "${ota_env_ready}" != "2"; then
+    setenv altbootcmd 'echo "OTA rollback"; if test "${kernel_rollback_slot}" != ""; then setenv kernel_slot ${kernel_rollback_slot}; else if test "${rollback_slot}" != ""; then setenv kernel_slot ${rollback_slot}; else if test "${kernel_slot}" = "B"; then setenv kernel_slot A; else setenv kernel_slot B; fi; fi; fi; if test "${rootfs_rollback_slot}" != ""; then setenv rootfs_slot ${rootfs_rollback_slot}; else if test "${rollback_slot}" != ""; then setenv rootfs_slot ${rollback_slot}; else if test "${rootfs_slot}" = "B"; then setenv rootfs_slot A; else setenv rootfs_slot B; fi; fi; fi; setenv boot_slot ${rootfs_slot}; setenv upgrade_available 0; setenv bootcount 0; setenv ota_try 0; saveenv; reset'
+    setenv ota_env_ready 2
     saveenv
 fi
 
@@ -50,12 +58,27 @@ if test "${upgrade_available}" = "1"; then
     if test ${ota_try} -gt 3; then
         echo "OTA rollback: boot failed too many times"
 
-        if test "${rollback_slot}" != ""; then
-            setenv boot_slot ${rollback_slot}
+        if test "${kernel_rollback_slot}" != ""; then
+            setenv kernel_slot ${kernel_rollback_slot}
         else
-            setenv boot_slot A
+            if test "${rollback_slot}" != ""; then
+                setenv kernel_slot ${rollback_slot}
+            else
+                setenv kernel_slot A
+            fi
         fi
 
+        if test "${rootfs_rollback_slot}" != ""; then
+            setenv rootfs_slot ${rootfs_rollback_slot}
+        else
+            if test "${rollback_slot}" != ""; then
+                setenv rootfs_slot ${rollback_slot}
+            else
+                setenv rootfs_slot A
+            fi
+        fi
+
+        setenv boot_slot ${rootfs_slot}
         setenv upgrade_available 0
         setenv bootcount 0
         setenv ota_try 0
@@ -76,16 +99,23 @@ fi
 #  kernel: zImage_B
 #  rootfs: /dev/mmcblk1p3
 
-if test "${boot_slot}" = "B"; then
+if test "${kernel_slot}" = "B"; then
     setenv ota_kernel zImage_B
+else
+    setenv kernel_slot A
+    setenv ota_kernel zImage_A
+fi
+
+if test "${rootfs_slot}" = "B"; then
     setenv ota_root /dev/mmcblk1p3
 else
-    setenv boot_slot A
-    setenv ota_kernel zImage_A
+    setenv rootfs_slot A
     setenv ota_root /dev/mmcblk1p2
 fi
 
-echo "OTA boot slot=${boot_slot} kernel=${ota_kernel} root=${ota_root}"
+setenv boot_slot ${rootfs_slot}
+
+echo "OTA boot kernel_slot=${kernel_slot} kernel=${ota_kernel} rootfs_slot=${rootfs_slot} root=${ota_root}"
 
 
  #lấy kernel theo slot hiện tại trước. Nếu đang chọn slot A
@@ -111,9 +141,9 @@ fi
 #set command line cho Linux kernel như này: log ra UART nào, rootfs nằm ở đâu,
 #đợi rootfs xuất hiện,mount read-write, và báo cho Linux biết đang boot slot A hay B.
 
-setenv ota_rollback 'echo "OTA rollback"; if test "${rollback_slot}" != ""; then setenv boot_slot ${rollback_slot}; else setenv boot_slot A; fi; setenv upgrade_available 0; setenv bootcount 0; setenv ota_try 0; saveenv; reset'
+setenv ota_rollback 'echo "OTA rollback"; if test "${kernel_rollback_slot}" != ""; then setenv kernel_slot ${kernel_rollback_slot}; else if test "${rollback_slot}" != ""; then setenv kernel_slot ${rollback_slot}; else setenv kernel_slot A; fi; fi; if test "${rootfs_rollback_slot}" != ""; then setenv rootfs_slot ${rootfs_rollback_slot}; else if test "${rollback_slot}" != ""; then setenv rootfs_slot ${rollback_slot}; else setenv rootfs_slot A; fi; fi; setenv boot_slot ${rootfs_slot}; setenv upgrade_available 0; setenv bootcount 0; setenv ota_try 0; saveenv; reset'
 
-setenv bootargs console=${console},${baudrate} root=${ota_root} rootwait rw ota.slot=${boot_slot} panic=5
+setenv bootargs console=${console},${baudrate} root=${ota_root} rootwait rw ota.slot=${rootfs_slot} ota.kernel_slot=${kernel_slot} ota.rootfs_slot=${rootfs_slot} panic=5
 
 bootz ${loadaddr} - ${fdt_addr}
 
