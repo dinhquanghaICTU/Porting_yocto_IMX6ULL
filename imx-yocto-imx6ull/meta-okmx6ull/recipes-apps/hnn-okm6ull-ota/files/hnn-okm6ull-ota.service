@@ -17,7 +17,19 @@ After=wlan0-autostart.service mosquitto.service
 #nếu auto start wlan0 failse thi mqtt_led_app vẫn chạy tiếp mà không dừng 
 Wants=wlan0-autostart.service
 
+OnFailure=ota-app-rollback.service
+
+#nó theo dõi trong vong 60s để check xem có bị cash không 
+StartLimitIntervalSec=60
+
+# số lượng limit được restart lại
+StartLimitBurst=3
+
+#nếu qúa số lần này nó sẽ reboot lại 
+#StartLimitAction=reboot
+
 [Service]
+
 #start song coi như chạy luôn không force không tạo process con 
 Type=simple
 
@@ -29,13 +41,18 @@ ExecStartPre=/bin/sh -c 'for i in $(seq 1 30); do ip route | grep -q default && 
 #chạy app sau khi quá trình ExecStartPre thành công 
 ExecStart=/usr/bin/mqtt_led_app
 
+Restart=on-failure
+
 # mqtt_led_app crash
-    ↓
+#    ↓
 # systemd chờ 3 giây
-    ↓
+#    ↓
 # restart lại từ đầu    ← kể cả ExecStartPre
-Restart=always
+#Restart=always
 RestartSec=3
+
+StandardOutput=journal
+StandardError=journal
 
 
 ## → service chạy khi board boot bình thường

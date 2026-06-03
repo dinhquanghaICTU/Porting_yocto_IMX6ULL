@@ -1,0 +1,8 @@
+[Unit]
+Description=Rollback HNN OKM6ULL OTA application
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'UPGRADE=$(cat /var/lib/ota/upgrade_available 2>/dev/null || echo 0); if [ "$UPGRADE" != "1" ]; then echo "OTA rollback skipped: no pending upgrade"; exit 0; fi; if [ ! -x /usr/bin/appB/mqtt_led_app ]; then echo "OTA rollback failed: backup app missing"; exit 1; fi; cp /usr/bin/appB/mqtt_led_app /usr/bin/mqtt_led_app && chmod 0755 /usr/bin/mqtt_led_app && echo 0 > /var/lib/ota/upgrade_available && echo 0 > /var/lib/ota/app_try_count && rm -f /var/lib/ota/pending_app /var/lib/ota/rollback_app && sync'
+ExecStart=/bin/systemctl reset-failed hnn-okm6ull-ota.service
+ExecStart=/bin/systemctl start hnn-okm6ull-ota.service

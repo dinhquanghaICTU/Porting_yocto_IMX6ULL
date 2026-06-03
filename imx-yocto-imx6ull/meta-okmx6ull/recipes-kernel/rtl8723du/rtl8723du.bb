@@ -1,3 +1,4 @@
+LICENSE = "CLOSED"
 
 # Lấy source driver local từ thư mục files của recipe.
 SRC_URI = "file://rtl8723DU/"

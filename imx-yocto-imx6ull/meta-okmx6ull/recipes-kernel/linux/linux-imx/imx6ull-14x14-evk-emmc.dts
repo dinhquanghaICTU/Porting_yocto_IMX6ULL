@@ -33,6 +33,12 @@
 	};
 };
 
+&reg_sd1_vmmc {
+	/delete-property/ gpio;
+	/delete-property/ enable-active-high;
+	/delete-property/ off-on-delay-us;
+};
+
 &usbotg2 {
 	dr_mode = "host";
 	disable-over-current;

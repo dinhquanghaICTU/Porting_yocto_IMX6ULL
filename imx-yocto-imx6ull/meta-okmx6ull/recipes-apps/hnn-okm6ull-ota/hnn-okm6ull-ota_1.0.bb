@@ -1,28 +1,32 @@
+LICENSE = "CLOSED"
+
 # add mosquitto vao luc build
-# them files header cua mosquitto vao
+# them file header cua mosquitto vao
 DEPENDS = "mosquitto"
-#cho lib .so cua mosquitto chay runtime tren board
+
+# cho lib .so cua mosquitto chay runtime tren board
 RDEPENDS:${PN} += "mosquitto"
 
-
-#source app tren git de keo ve va build 
+# source app tren git de keo ve va build
+# them service chinh va service rollback vao rootfs
 SRC_URI = "git://github.com/dinhquanghaICTU/HNN_OKM6ULL_OTA.git;protocol=https;branch=main \
-           file://hnn-okm6ull-ota.service"
+           file://hnn-okm6ull-ota.service \
+           file://ota-app-rollback.service"
 
-
-#chi dinh thu muc source sau khi keo ve nam o source git dẻ commpile lai 
+# chi dinh thu muc source sau khi keo ve nam o source git de compile lai
 SRCREV = "${AUTOREV}"
 S = "${WORKDIR}/git"
 
-#no se ung dung cho các cau lenh duoi de biet add vao service nao can ennable hay disable
+# dung class systemd de enable/disable service
 inherit systemd
 
-#cho bitbake biet file service ten gi, install o dau 
-SYSTEMD_SERVICE:${PN} = "hnn-okm6ull-ota.service"
-#co tu chạy luc boot khong 
+# cho bitbake biet cac file service ten gi
+SYSTEMD_SERVICE:${PN} = "hnn-okm6ull-ota.service ota-app-rollback.service"
+
+# tu dong chay service luc boot
 SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 
-#bitbake se lam xóa file build cũ ep build bang compiler của yocto vi cái makefile trong src thi duong dan se khac  
+# build app bang compiler cua Yocto
 do_compile() {
     oe_runmake clean
 
@@ -33,15 +37,18 @@ do_compile() {
         LDFLAGS="${LDFLAGS} -lmosquitto -lpthread"
 }
 
-#tao thu muc cho file .bin (arm) sau khi build song
-# tao thu muc cho service systemsystem
-
+# cai app va cac service vao rootfs
 do_install() {
     install -d ${D}${bindir}
     install -m 0755 ${S}/build/mqtt_led_app ${D}${bindir}/mqtt_led_app
 
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${WORKDIR}/hnn-okm6ull-ota.service ${D}${systemd_system_unitdir}/hnn-okm6ull-ota.service
+    install -m 0644 ${WORKDIR}/ota-app-rollback.service ${D}${systemd_system_unitdir}/ota-app-rollback.service
 }
-#hay duu file nay vao package 
-FILES:${PN} += "${systemd_system_unitdir}/hnn-okm6ull-ota.service"
+
+# hay dua cac file nay vao package
+FILES:${PN} += " \
+    ${systemd_system_unitdir}/hnn-okm6ull-ota.service \
+    ${systemd_system_unitdir}/ota-app-rollback.service \
+"

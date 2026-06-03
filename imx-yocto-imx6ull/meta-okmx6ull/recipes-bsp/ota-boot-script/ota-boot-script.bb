@@ -1,21 +1,22 @@
+LICENSE = "CLOSED"
 
-#kấy ra file boot.cmd. để chuẩn bị compilẻ ra boot.scr
+#lay ra file boot.cmd de chuan bi compile ra boot.scr
 SRC_URI = "file://boot.cmd"
 
-thêm class deploy của Yocto, nó sẽ hỗ trợ làm các task
+#them class deploy cua Yocto, no se ho tro lam cac task deploy
 inherit deploy
 
-#recipe này cần tool mkimage của U-Boot để chạy trên máy build host.
+#recipe nay can tool mkimage cua U-Boot de chay tren may build host
 DEPENDS += "u-boot-mkimage-native"
 
-
-#Lấy file text boot.cmd, dùng tool mkimage đóng gói nó thành script U-Boot tên boot.scr.
+#lay file text boot.cmd, dung tool mkimage dong goi thanh script U-Boot ten boot.scr
 do_compile() {
     mkimage -A arm -O linux -T script -C none \
         -n "OKM6ULL OTA boot script" \
         -d ${WORKDIR}/boot.cmd ${B}/boot.scr
 }
-#tạo thư mục deploy, rồi copy boot.scr và cả boot.cmd ra đó
+
+#tao thu muc deploy, roi copy boot.scr va boot.cmd ra do
 do_deploy() {
     install -d ${DEPLOYDIR}
     install -m 0644 ${B}/boot.scr ${DEPLOYDIR}/boot.scr
