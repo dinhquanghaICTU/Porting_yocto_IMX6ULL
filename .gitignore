@@ -1,33 +1,14 @@
 *
+
 !.gitignore
 
 !schematic/
 !schematic/**
 
 !imx-yocto-imx6ull/
-imx-yocto-imx6ull/*
-
 !imx-yocto-imx6ull/build-fb/
-imx-yocto-imx6ull/build-fb/*
 !imx-yocto-imx6ull/build-fb/conf/
 !imx-yocto-imx6ull/build-fb/conf/**
 
 !imx-yocto-imx6ull/meta-okmx6ull/
-imx-yocto-imx6ull/meta-okmx6ull/*
-!imx-yocto-imx6ull/meta-okmx6ull/conf/
-!imx-yocto-imx6ull/meta-okmx6ull/conf/**
-!imx-yocto-imx6ull/meta-okmx6ull/recipes-bsp/
-!imx-yocto-imx6ull/meta-okmx6ull/recipes-bsp/**
-!imx-yocto-imx6ull/meta-okmx6ull/recipes-kernel/
-!imx-yocto-imx6ull/meta-okmx6ull/recipes-kernel/**
-!imx-yocto-imx6ull/meta-okmx6ull/recipes-core/
-!imx-yocto-imx6ull/meta-okmx6ull/recipes-core/**
-!imx-yocto-imx6ull/meta-okmx6ull/recipes-support/
-!imx-yocto-imx6ull/meta-okmx6ull/recipes-support/**
-!imx-yocto-imx6ull/meta-okmx6ull/recipes-apps/
-!imx-yocto-imx6ull/meta-okmx6ull/recipes-apps/**
-!imx-yocto-imx6ull/meta-okmx6ull/wic
-!imx-yocto-imx6ull/meta-okmx6ull/wic/**
-
-imx-yocto-imx6ull/.repo/
-**/.repo/
+!imx-yocto-imx6ull/meta-okmx6ull/**
