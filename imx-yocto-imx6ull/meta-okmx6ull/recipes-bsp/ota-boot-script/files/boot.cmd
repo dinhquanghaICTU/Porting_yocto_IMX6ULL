@@ -5,6 +5,9 @@ echo "Running OKM6ULL OTA boot script"
 # từ vùng đã cấu hình bằng CONFIG_ENV_OFFSET/CONFIG_ENV_SIZE.
 # boot_slot là biến legacy dùng từ thiết kế A/B ban đầu.
 # Nếu máy mới flash hoặc env chưa có boot_slot thì mặc định chọn slot A.
+
+#test là cú pháp của uboot sheel 
+
 if test "${boot_slot}" = ""; then
     setenv boot_slot A
 fi
@@ -46,7 +49,42 @@ fi
 #   rollback_slot là biến cũ, chỉ dùng làm fallback
 # Sau rollback sẽ tắt upgrade_available, reset bộ đếm thử boot, saveenv và reset.
 if test "${ota_env_ready}" != "2"; then
-    setenv altbootcmd 'echo "OTA rollback"; if test "${kernel_rollback_slot}" != ""; then setenv kernel_slot ${kernel_rollback_slot}; else if test "${rollback_slot}" != ""; then setenv kernel_slot ${rollback_slot}; else if test "${kernel_slot}" = "B"; then setenv kernel_slot A; else setenv kernel_slot B; fi; fi; fi; if test "${rootfs_rollback_slot}" != ""; then setenv rootfs_slot ${rootfs_rollback_slot}; else if test "${rollback_slot}" != ""; then setenv rootfs_slot ${rollback_slot}; else if test "${rootfs_slot}" = "B"; then setenv rootfs_slot A; else setenv rootfs_slot B; fi; fi; fi; setenv boot_slot ${rootfs_slot}; setenv upgrade_available 0; setenv bootcount 0; setenv ota_try 0; saveenv; reset'
+
+    setenv altbootcmd '
+        echo "OTA rollback";
+
+        if test "${kernel_rollback_slot}" != ""; then
+            setenv kernel_slot ${kernel_rollback_slot};
+        else if test "${rollback_slot}" != ""; then
+            setenv kernel_slot ${rollback_slot};
+        else
+            if test "${kernel_slot}" = "B"; then
+                setenv kernel_slot A;
+            else
+                setenv kernel_slot B;
+            fi;
+        fi; fi;
+
+        if test "${rootfs_rollback_slot}" != ""; then
+            setenv rootfs_slot ${rootfs_rollback_slot};
+        else if test "${rollback_slot}" != ""; then
+            setenv rootfs_slot ${rollback_slot};
+        else
+            if test "${rootfs_slot}" = "B"; then
+                setenv rootfs_slot A;
+            else
+                setenv rootfs_slot B;
+            fi;
+        fi; fi;
+
+        setenv boot_slot ${rootfs_slot};
+        setenv upgrade_available 0;
+        setenv bootcount 0;
+        setenv ota_try 0;
+        saveenv;
+        reset
+    '
+
     setenv ota_env_ready 2
     saveenv
 fi

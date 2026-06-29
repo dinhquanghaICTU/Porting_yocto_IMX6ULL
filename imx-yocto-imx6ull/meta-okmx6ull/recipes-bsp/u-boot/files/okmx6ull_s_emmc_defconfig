@@ -4,8 +4,13 @@ CONFIG_SYS_MALLOC_LEN=0x1000000
 CONFIG_NR_DRAM_BANKS=1
 CONFIG_SYS_MEMTEST_START=0x80000000
 CONFIG_SYS_MEMTEST_END=0x88000000
+
+# biết biến môi trường size bao nhiêu 
 CONFIG_ENV_SIZE=0x2000
+
+#tại sao nó tìm được thấy biến môi trường trên emmc 
 CONFIG_ENV_OFFSET=0x400000
+
 CONFIG_MX6ULL=y
 CONFIG_TARGET_MX6ULL_14X14_EVK=y
 CONFIG_SYS_I2C_MXC_I2C1=y
@@ -14,7 +19,63 @@ CONFIG_DM_GPIO=y
 CONFIG_DEFAULT_DEVICE_TREE="imx6ull-14x14-evk-emmc"
 CONFIG_SUPPORT_RAW_INITRD=y
 CONFIG_USE_BOOTCOMMAND=y
-CONFIG_BOOTCOMMAND="run findfdt;mmc dev ${mmcdev};mmc dev ${mmcdev}; if mmc rescan; then if run loadbootscript; then run bootscript; else if run loadimage; then run mmcboot; else run netboot; fi; fi; else run netboot; fi"
+
+
+/*
+1. run findfdt
+tìm đúng file .dtb (device tree) phù hợp với board
+→ set biến $fdt_file
+tại sao nó biết được file nào qua biến này nó do config 
+CONFIG_DEFAULT_FDT_FILE="imx6ull-14x14-evk-emmc.dtb"
+
+2. mmc dev ${mmcdev} (2 lần)
+chọn MMC device (mmcdev thường = 1 cho eMMC)
+gọi 2 lần để đảm bảo init xong
+
+nó do config này CONFIG_SYS_MMC_ENV_DEV
+
+3. if mmc rescan
+kiểm tra eMMC có hoạt động không
+    → không scan được → run netboot (boot qua mạng)
+    → scan được      → tiếp tục
+
+4. if run loadbootscript
+tìm file boot.scr trên eMMC
+    → có boot.scr → run bootscript (chạy script tùy chỉnh)
+    → không có   → tiếp tục
+
+5. if run loadimage
+tìm kernel image (zImage) trên eMMC
+    → có kernel → run mmcboot (boot từ eMMC)
+    → không có  → run netboot (boot qua mạng TFTP)
+
+
+    findfdt
+    ↓
+mmc rescan
+    ├── FAIL → netboot
+    └── OK
+         ↓
+    loadbootscript
+         ├── OK → bootscript (boot.scr)
+         └── FAIL
+              ↓
+         loadimage
+              ├── OK → mmcboot (boot kernel từ eMMC)
+              └── FAIL → netboot (TFTP)
+
+
+
+              /home/quanghaictu/learn_yocto/imx-yocto-imx6ull/meta-okmx6ull/recipes-bsp/ota-boot-script/files/boot.cmd
+
+
+nếu muốn xem nó deconfig như nào 
+/home/quanghaictu/learn_yocto/imx-yocto-imx6ull/build-fb/tmp/work/x86_64-linux/u-boot-imx-tools-native/2022.04-r0/git/include/configs/mx6ullevk.h (line 91)
+*/
+CONFIG_BOOTCOMMAND="ledblink 3 100;run findfdt;mmc dev ${mmcdev};mmc dev ${mmcdev}; if mmc rescan; then if run loadbootscript; then run bootscript; else if run loadimage; then run mmcboot; else run netboot; fi; fi; else run netboot; fi"
+
+
+
 CONFIG_BOOTDELAY=3
 CONFIG_BOOTCOUNT_LIMIT=y
 CONFIG_BOOTCOUNT_ENV=y
@@ -40,6 +101,11 @@ CONFIG_CMD_BOOTCOUNT=y
 CONFIG_CMD_EXT2=y
 CONFIG_CMD_EXT4=y
 CONFIG_CMD_EXT4_WRITE=y
+
+# đoạn này đã bật FAT này nên nó đọc được FAT
+#U-Boot có driver FAT nhỏ gọn được compile sẵn 
+#fatload là lệnh built-in, chạy được ngay từ đầu không cần gì thêm
+
 CONFIG_CMD_FAT=y
 CONFIG_CMD_FS_GENERIC=y
 CONFIG_OF_CONTROL=y
@@ -112,9 +178,10 @@ CONFIG_CMD_CRC32=y
 CONFIG_CRC32_VERIFY=y
 
 
+#là địa chỉ RAM nơi U-Boot proper bắt đầu chaỵ
+#no duoc ghi de file cua hang /home/quanghaictu/learn_yocto/imx-yocto-imx6ull/build-fb/tmp/work/okmx6ull_s_emmc-poky-linux-gnueabi/u-boot-imx/2022.04-r0/build/okmx6ull_s_emmc_defconfig/.config
+#cái này có thể chỉnh được 
 CONFIG_SYS_TEXT_BASE=0x87800000
-
-
 
 CONFIG_DEFAULT_FDT_FILE="imx6ull-14x14-evk-emmc.dtb"
 CONFIG_OF_LIST="imx6ull-14x14-evk-emmc"

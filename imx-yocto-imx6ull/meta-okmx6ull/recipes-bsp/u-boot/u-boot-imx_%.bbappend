@@ -1,8 +1,19 @@
+
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI += " file://okmx6ull_s_emmc_defconfig"
 
+
+SRC_URI += " file://command_blink_led.c"
+
 do_configure:prepend() {
+
+    install -m 0644 ${WORKDIR}/command_blink_led.c ${S}/cmd/
+
+    sed -i '/command_blink_led\.o/d' ${S}/cmd/Makefile
+    sed -i '/gpio\.o/a obj-$(CONFIG_CMD_GPIO) += command_blink_led.o' \
+    ${S}/cmd/Makefile
+
     install -m 0644 ${WORKDIR}/okmx6ull_s_emmc_defconfig \
         ${S}/configs/okmx6ull_s_emmc_defconfig
 
@@ -17,4 +28,3 @@ do_configure:prepend() {
     sed -i 's/0x021B0850 0x40403C33/0x021B0850 0x40403A34/' $CFG
     sed -i 's/0x021B0018 0x00201740/0x021B0018 0x00211740/' $CFG
 }
-

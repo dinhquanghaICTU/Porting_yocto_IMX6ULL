@@ -1,6 +1,6 @@
 # Ghi file U-Boot raw image vao dau disk.
 # Day khong phai partition binh thuong nen dung --no-table.
-part u-boot --source rawcopy --sourceparams="file=u-boot.imx" --ondisk mmcblk --no-table --align 1
+#part u-boot --source rawcopy --sourceparams="file=u-boot.imx" --ondisk mmcblk --no-table --align 1
 
 # Tao boot partition dang FAT.
 # Cac file trong IMAGE_BOOT_FILES se duoc copy vao partition nay:
