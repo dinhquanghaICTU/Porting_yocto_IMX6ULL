@@ -67,6 +67,8 @@ U_BOOT_CMD(
 	3, // tổng số tối đa agruments được truyền vào 
 	0, // không repeat
 	do_ledblink,// function pointer handler logic
+	
+	// khi gõ help ledblink =>| thì nó  xem ra giới thiệu cú pháp  
 	"blink board status LED",
 	"[count] [delay_ms]\n"
 	"    - blink LED count times with delay in milliseconds"

@@ -4,8 +4,16 @@ LICENSE = "CLOSED"
 # them file header cua mosquitto vao
 DEPENDS = "mosquitto"
 
-# cho lib .so cua mosquitto chay runtime tren board
-RDEPENDS:${PN} += "mosquitto"
+# Runtime tối thiểu cho MQTT và OTA A/B. App gọi trực tiếp zstd,
+# mkfs.ext4/mke2fs và fw_setenv qua system(), nên khai báo tại recipe thay
+# vì phụ thuộc ngầm vào local.conf.
+RDEPENDS:${PN} += " \
+    mosquitto \
+    zstd \
+    e2fsprogs-mke2fs \
+    libubootenv-bin \
+    u-boot-env-config \
+"
 
 # source app tren git de keo ve va build
 # them service chinh va service rollback vao rootfs
@@ -52,3 +60,5 @@ FILES:${PN} += " \
     ${systemd_system_unitdir}/hnn-okm6ull-ota.service \
     ${systemd_system_unitdir}/ota-app-rollback.service \
 "
+
+#output nó nằm ở đây /home/quanghaictu/learn_yocto/imx-yocto-imx6ull/build-fb/tmp/work/cortexa7t2hf-neon-poky-linux-gnueabi/hnn-okm6ull-ota/1.0-r0/git/build/mqtt_led_app

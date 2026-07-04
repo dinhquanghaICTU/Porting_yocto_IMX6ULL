@@ -1,0 +1,41 @@
+From: Quang Hai <quanghaictu@example.com>
+Subject: [PATCH] mx6ullevk: set ONOFF hardware shutdown timeout to 10 seconds
+
+Configure SNVS LPCR BTN_PRESS_TIME to 10 seconds. This keeps the
+hardware long-press shutdown feature enabled while leaving enough time
+for software to handle a shorter five-second press.
+
+---
+ board/freescale/mx6ullevk/mx6ullevk.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+Index: git/board/freescale/mx6ullevk/mx6ullevk.c
+===================================================================
+--- git.orig/board/freescale/mx6ullevk/mx6ullevk.c	2026-06-30 08:21:35.120970106 +0700
++++ git/board/freescale/mx6ullevk/mx6ullevk.c	2026-06-30 08:21:35.672991826 +0700
+@@ -30,6 +30,10 @@
+ #include <power/pfuze3000_pmic.h>
+ #include "../common/pfuze.h"
+ 
++#define SNVS_LPCR                         (SNVS_BASE_ADDR + 0x38)
++#define SNVS_LPCR_BTN_PRESS_TIME_MASK     GENMASK(17, 16)
++#define SNVS_LPCR_BTN_PRESS_TIME_10S      BIT(16)
++
+ DECLARE_GLOBAL_DATA_PTR;
+ 
+ #define UART_PAD_CTRL  (PAD_CTL_PKE | PAD_CTL_PUE |		\
+@@ -287,6 +291,11 @@
+ {
+ 	setup_iomux_uart();
+ 
++	/* Keep hardware shutdown enabled, but require a 10-second hold. /home/quanghaictu/learn_yocto/imx-yocto-imx6ull/build-fb/tmp/work/okmx6ull_s_emmc-poky-linux-gnueabi/u-boot-imx/2022.04-r0/git/board/freescale/mx6ullevk/mx6ullevk.c*/
++	clrsetbits_le32((void *)SNVS_LPCR,
++			SNVS_LPCR_BTN_PRESS_TIME_MASK,
++			SNVS_LPCR_BTN_PRESS_TIME_10S);
++
+ 	return 0;
+ }
+
+
+ 
+ 

@@ -1,62 +1,17 @@
-
-#neu nhu set thu cong nhu luc dau em lam thi sẽ nhet vào local.conf
-#nhung lam vay sẽ gặp vấn đề 
-# 1. Board reboot → app không tự chạy lại
-# 2. App crash → chết luôn, không ai restart
-# 3. Không biết app đang chạy hay chết
-# 4. Phải SSH vào board chạy tay mỗi lần
-
 [Unit]
-
-#mô tả tên service nay lam gi 
 Description=HNN OKM6ULL OTA Application
-
-#chạy sau khi hai serice này chạy song la mosquitto 
-After=wlan0-autostart.service mosquitto.service
-
-#nếu auto start wlan0 failse thi mqtt_led_app vẫn chạy tiếp mà không dừng 
-Wants=wlan0-autostart.service
-
+After=local-fs.target
 OnFailure=ota-app-rollback.service
-
-#nó theo dõi trong vong 60s để check xem có bị cash không 
 StartLimitIntervalSec=60
-
-# số lượng limit được restart lại
 StartLimitBurst=3
 
-#nếu qúa số lần này nó sẽ reboot lại 
-#StartLimitAction=reboot
-
 [Service]
-
-#start song coi như chạy luôn không force không tạo process con 
 Type=simple
-
-# Đoạn này là loop kiểm tra xem có ip từ route chưa 
-#nếu có rồi thì thoát chạy app, nếu chưa có chờ 1s lại chạy đến hết timeout 
-#hết time_out thì sẽ không chạy app
-ExecStartPre=/bin/sh -c 'for i in $(seq 1 30); do ip route | grep -q default && exit 0; sleep 1; done; exit 1'
-
-#chạy app sau khi quá trình ExecStartPre thành công 
 ExecStart=/usr/bin/mqtt_led_app
-
 Restart=on-failure
-
-# mqtt_led_app crash
-#    ↓
-# systemd chờ 3 giây
-#    ↓
-# restart lại từ đầu    ← kể cả ExecStartPre
-#Restart=always
 RestartSec=3
-
 StandardOutput=journal
 StandardError=journal
 
-
-## → service chạy khi board boot bình thường
-# → có network
-# → không cần GUI
 [Install]
 WantedBy=multi-user.target

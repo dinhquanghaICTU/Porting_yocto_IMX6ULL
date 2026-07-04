@@ -6,6 +6,12 @@ SRC_URI += " file://okmx6ull_s_emmc_defconfig"
 
 SRC_URI += " file://command_blink_led.c"
 
+
+SRC_URI += " file://command_button_jump_kernel.c"
+
+
+SRC_URI += " file://0001-mx6ull-set-onoff-hold-time-to-10-seconds.patch"
+
 do_configure:prepend() {
 
     install -m 0644 ${WORKDIR}/command_blink_led.c ${S}/cmd/
@@ -13,6 +19,13 @@ do_configure:prepend() {
     sed -i '/command_blink_led\.o/d' ${S}/cmd/Makefile
     sed -i '/gpio\.o/a obj-$(CONFIG_CMD_GPIO) += command_blink_led.o' \
     ${S}/cmd/Makefile
+
+    install -m 0644 ${WORKDIR}/command_button_jump_kernel.c \
+        ${S}/cmd/
+    
+    sed -i '/command_button_jump_kernel\.o/d' ${S}/cmd/Makefile
+    sed -i '/command_blink_led\.o/a obj-y += command_button_jump_kernel.o' \
+        ${S}/cmd/Makefile
 
     install -m 0644 ${WORKDIR}/okmx6ull_s_emmc_defconfig \
         ${S}/configs/okmx6ull_s_emmc_defconfig

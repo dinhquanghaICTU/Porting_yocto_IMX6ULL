@@ -140,8 +140,11 @@ if test "${upgrade_available}" = "1"; then
         reset
     fi
 else
-    setenv ota_try 0
-    saveenv
+    # Boot binh thuong khong ghi lai eMMC neu ota_try da bang 0.
+    if test "${ota_try}" != "0"; then
+        setenv ota_try 0
+        saveenv
+    fi
 fi
 
 
@@ -205,7 +208,7 @@ setenv ota_rollback 'echo "OTA rollback"; if test "${kernel_rollback_slot}" != "
 #   rootwait rw        đợi block device xuất hiện và mount read-write
 #   ota.*              báo slot hiện tại cho app Linux đọc từ /proc/cmdline
 #   panic=5            kernel panic thì tự reboot sau 5 giây
-setenv bootargs console=${console},${baudrate} root=${ota_root} rootwait rw ota.slot=${rootfs_slot} ota.kernel_slot=${kernel_slot} ota.rootfs_slot=${rootfs_slot} panic=5
+setenv bootargs console=${console},${baudrate} root=${ota_root} rootwait rw quiet loglevel=3 ota.slot=${rootfs_slot} ota.kernel_slot=${kernel_slot} ota.rootfs_slot=${rootfs_slot} panic=5
 
 # Boot Linux bằng zImage và DTB đã load.
 bootz ${loadaddr} - ${fdt_addr}
