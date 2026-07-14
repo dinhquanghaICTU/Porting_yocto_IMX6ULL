@@ -60,3 +60,12 @@
 &uart2  { status = "disabled"; };
 &usbotg1 { status = "disabled"; };
 &usdhc1 { status = "disabled"; };
+
+
+&qspi { status = "disabled"; };
+&pxp { status = "disabled"; };
+&fec1 { status = "disabled"; };
+&fec2 { status = "disabled"; };
+
+
+

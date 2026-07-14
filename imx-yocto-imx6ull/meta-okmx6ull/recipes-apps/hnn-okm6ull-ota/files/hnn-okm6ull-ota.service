@@ -1,6 +1,8 @@
 [Unit]
 Description=HNN OKM6ULL OTA Application
+DefaultDependencies=no
 After=local-fs.target
+Before=multi-user.target
 OnFailure=ota-app-rollback.service
 StartLimitIntervalSec=60
 StartLimitBurst=3
@@ -8,8 +10,8 @@ StartLimitBurst=3
 [Service]
 Type=simple
 ExecStart=/usr/bin/mqtt_led_app
-Restart=on-failure
-RestartSec=3
+Restart=always
+RestartSec=2
 StandardOutput=journal
 StandardError=journal
 

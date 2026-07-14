@@ -13,5 +13,18 @@ SRC_URI += "file://imx6ull-14x14-evk-emmc.dts"
 # Trước bước configure kernel, copy DTS custom vào cây source kernel để kernel build ra DTB.
 do_configure:prepend() {
     cp ${WORKDIR}/imx6ull-14x14-evk-emmc.dts \
-       ${S}/arch/arm/boot/dts/imx6ull-14x14-evk-emmc.dts
+       ${S}/arch/arm/boot/dts/imx6ull-14x14-evk-emmc.dts \
+       
+}
+
+# them tắt bluetooth
+
+
+do_configure:append() {
+    cd ${B}
+    ${S}/scripts/config --disable BT
+    ${S}/scripts/config --disable BT_RTL
+    ${S}/scripts/config --disable BT_HCIBTUSB
+    ${S}/scripts/config --disable BT_HCIUART
+    oe_runmake olddefconfig
 }

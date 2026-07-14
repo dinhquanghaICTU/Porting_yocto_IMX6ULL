@@ -5,7 +5,7 @@ auto lo
 iface lo inet loopback
 
 #auto up wlan lên 
-auto wlan0
+#auto wlan0
 #gọi dhcp xin ip tren con board này   
 iface wlan0 inet dhcp
 #no se chạy nen ket noi wifi co săn truoc o file wpa_supplicant.conf
